@@ -91,9 +91,14 @@
 
     $(document).ready(function() {
       initialize_gmaps();
-      var days = [];
+      var days = {};
       var current = 0;
+      var numDays = 0;
       $(".add").click(function(){
+        if(current === 0){
+          console.log("Na");
+          return;
+        }
         var type = $(this).siblings("h4")[0].innerText;
         if(type === "Hotels") type = "Hotel";
         var option = $(this).siblings("select")[0].selectedOptions[0].outerText;
@@ -106,20 +111,24 @@
         if(type === hotelName){
             var length = hotels.childNodes[3].childNodes.length;
             if(length < 1){
-              var html = '<div class="itinerary-item added"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
+              var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
               $(hotels.childNodes[3]).append(html);
+              days[current.toString()]["hotels"]+= html;
+
             }
         }else if(type === restaurantName){
             var length = restaurants.childNodes[3].childNodes.length;
             if(length < 3){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
               $(restaurants.childNodes[3]).append(html);
+              days[current.toString()]["restaurants"]+=html;
             }
         }else if(type === activityName){
             var length = activities.childNodes[3].childNodes.length;
             if(length < 2){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
               $(activities.childNodes[3]).append(html);
+              days[current.toString()]["activities"]+=html;
             }
         }
       });
@@ -137,22 +146,23 @@
         var parent = $(this).parent();
         $(this).remove();
         parent.append(last + " " + addDay);
-        days.push(dayInfo);
+        days[numDays.toString()] = {"activities":'<div><h4>My Hotel</h4><ul class="list-group">',"restaurants":'<div><h4>My Hotel</h4><ul class="list-group">',"hotels":'<div><h4>My Hotel</h4><ul class="list-group">'};
+        numDays++;
       });
 
       $(document).on("click", ".day-btn", function(){
-        console.dir(days);
-        days[current] = $(".day-info").clone();
         var num = parseInt(this.innerText);
-        console.log(num);
-        var newDay = days[num];
-        current = num;
-        $(".day-info").innerHTML = days[current];
-        console.dir($("#day-title"));
+        current = num-1;
+        console.log("Current", current);
+        var currentDay = days[current.toString()];
+        console.log(current);
+        var answer = currentDay["hotels"] + '</ul></div>' + currentDay["restaurants"] + '</ul></div>' + currentDay["activities"] + '</ul></div>' + "</div>"
+        console.log("Answer", answer);
+        $(".day-info").innerHTML = answer;
         $("#day-title")[0].firstElementChild.innerText = "Day " + current.toString();
       });
-
     });
+
     var styleArr = [{
       featureType: "landscape",
       stylers: [{
