@@ -1,5 +1,5 @@
-$light-blue: #a8c9dd;
-$medium-brown: #736357;
+$light-blue: #FFFF99;
+$medium-brown: #5F9EA0 ;
 $transparent: rgba(0,0,0,0);
 
 $screen-sm: 768px;
@@ -86,11 +86,11 @@ select {
 }
 
 .btn-primary {
-  background: darken($light-blue, 20%);
-  border-color: darken($light-blue, 22%);
+  background: #5F9EA0;
+  border-color: darken(#5F9EA0, 2%);
   &:hover {
-    background: darken($light-blue, 30%);
-    border-color: darken($light-blue, 32%);
+    background: darken(#5F9EA0, 30%);
+    border-color: darken(#5F9EA0, 32%);
   }
 }
 
