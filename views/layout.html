@@ -139,18 +139,21 @@
       $(document).on("click", ".removeDay", function(){
         var string = $(this).siblings("span")[0].innerText;
         var value = parseInt(string[string.length-1]);
+        console.log("The number just pressed", value);
         if(!isNaN(value)){
           if(value === 1){
             if(Object.keys(days).length === 1){
               $(this).siblings("span").html("Plan Your Trip");
             }else{
-              $(this).siblings("span").html("Plan Your Trip");
+              $(this).siblings("span").html("Pick a Day");
             }
+            console.log("ID # " + value);
             $("#"+value).remove();
             delete days[value-1];
             days = updateButtons();
             numDays--;
           }else{
+            console.log("ID # " + value);
             $(this).siblings("span").html("Pick a Day");
             $("#"+value).remove();
             delete days[value-1];
@@ -168,12 +171,14 @@
         for(var key in days){
           if(key != counter){
             var oldId = parseInt(key) + 1;
-            var newId = parseInt(counter);
+            var newId = parseInt(counter+1);
             console.log("Deleted Key",key);
             console.log("New Counter",counter);
+            console
             console.dir($("#"+oldId));
             $("#"+oldId).html(counter+1);
             $("#"+oldId).attr("id",newId.toString());
+
             var value = days[key];
             newObj[counter] = value;
           }else{
@@ -197,6 +202,8 @@
         $(this).remove();
         parent.append(last + " " + addDay);
         days[numDays.toString()] = {"activities":'<div><h4>My Activities</h4><ul class="list-group">',"restaurants":'<div><h4>My Restaurants</h4><ul class="list-group">',"hotels":'<div><h4>My Hotels</h4><ul class="list-group">'};
+        console.log("Add");
+        console.dir(days);
         numDays++;
       });
 
