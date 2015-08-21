@@ -94,7 +94,7 @@
       var days = {};
       var current = 0;
       var numDays = 0;
-      $(".add").click(function(){
+      $(document).on("click",".add", function(){
         if(current === 0){
           console.log("Na");
           return;
@@ -102,37 +102,42 @@
         var type = $(this).siblings("h4")[0].innerText;
         if(type === "Hotels") type = "Hotel";
         var option = $(this).siblings("select")[0].selectedOptions[0].outerText;
-        var hotels = $(".current")[0].childNodes[3].childNodes[3].childNodes[1];
-        var restaurants = $(".current")[0].childNodes[3].childNodes[3].childNodes[3];
-        var activities = $(".current")[0].childNodes[3].childNodes[3].childNodes[5];
+        var hotels = $(".current")[0]//.childNodes[3]//.childNodes[3]//.childNodes[0];
+        var restaurants = $(".current")//[0].childNodes[3]//.childNodes[3]//.childNodes//[1];
+        var activities = $(".current")//[0].childNodes[3]//.childNodes[3]//.childNodes//[2];
+        console.dir("Hotels", hotels);
+        console.dir("Restaurants",restaurants);
+        console.dir("Activities",activities);
         var hotelName = hotels.childNodes[1].innerText.slice(3);
         var restaurantName = restaurants.childNodes[1].innerText.slice(3);
         var activityName = activities.childNodes[1].innerText.slice(3);
         if(type === hotelName){
-            var length = hotels.childNodes[3].childNodes.length;
+            var length = hotels.childNodes[1].childNodes.length;
             if(length < 1){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              $(hotels.childNodes[3]).append(html);
-              days[current.toString()]["hotels"]+= html;
+              console.dir($(hotels.childNodes[1]));
+              $(hotels.childNodes[1]).append(html);
+              days[(current-1).toString()]["hotels"]+= html;
 
             }
         }else if(type === restaurantName){
-            var length = restaurants.childNodes[3].childNodes.length;
+            var length = restaurants.childNodes[1].childNodes.length;
             if(length < 3){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              $(restaurants.childNodes[3]).append(html);
-              days[current.toString()]["restaurants"]+=html;
+              console.dir($(restaurants.childNodes[1]));
+              $(restaurants.childNodes[1]).append(html);
+              days[(current-1).toString()]["restaurants"]+=html;
             }
         }else if(type === activityName){
-            var length = activities.childNodes[3].childNodes.length;
+            var length = activities.childNodes[1].childNodes.length;
             if(length < 2){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              $(activities.childNodes[3]).append(html);
-              days[current.toString()]["activities"]+=html;
+              console.dir($(activities.childNodes[1]));
+              $(activities.childNodes[1]).append(html);
+              days[(current-1).toString()]["activities"]+=html;
             }
         }
       });
-
       $(document).on("click", ".remove", function(){
         $(this).parent().remove()
       });
@@ -141,24 +146,26 @@
         if($(this).prev()[0] == undefined) var dayNum = 1;
         else var dayNum = parseInt($(this).prev()[0].innerText)+1;
         var last = '<button class="btn btn-circle day-btn">'+dayNum+'</button>';
-        var addDay = '<button class="btn btn-circle day-btn add-day">+</button>'
+        var addDay = '<button class="btn btn-circle add-day">+</button>'
         var dayInfo = '<div class="panel-body day-info"><div><h4>My Hotel</h4><ul class="list-group"></ul></div><div><h4>My Restaurants</h4><ul class="list-group"></ul></div><div><h4>My Activities</h4><ul class="list-group"></ul></div></div>'
         var parent = $(this).parent();
         $(this).remove();
         parent.append(last + " " + addDay);
-        days[numDays.toString()] = {"activities":'<div><h4>My Hotel</h4><ul class="list-group">',"restaurants":'<div><h4>My Hotel</h4><ul class="list-group">',"hotels":'<div><h4>My Hotel</h4><ul class="list-group">'};
+        days[numDays.toString()] = {"activities":'<div><h4>My Activities</h4><ul class="list-group">',"restaurants":'<div><h4>My Restaurants</h4><ul class="list-group">',"hotels":'<div><h4>My Hotels</h4><ul class="list-group">'};
         numDays++;
       });
 
       $(document).on("click", ".day-btn", function(){
+        console.dir(this);
+        console.log("Inner",this.innerText)
         var num = parseInt(this.innerText);
-        current = num-1;
+        current = num;
         console.log("Current", current);
-        var currentDay = days[current.toString()];
+        var currentDay = days[(current - 1).toString()];
         console.log(current);
-        var answer = currentDay["hotels"] + '</ul></div>' + currentDay["restaurants"] + '</ul></div>' + currentDay["activities"] + '</ul></div>' + "</div>"
+        var answer = currentDay["hotels"] + '</ul></div>' + currentDay["restaurants"] + '</ul></div>' + currentDay["activities"] + '</ul></div>'
         console.log("Answer", answer);
-        $(".day-info").innerHTML = answer;
+        $(".day-info").html(answer);
         $("#day-title")[0].firstElementChild.innerText = "Day " + current.toString();
       });
     });
