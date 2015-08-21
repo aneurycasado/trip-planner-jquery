@@ -100,17 +100,13 @@
           return;
         }
         var type = $(this).siblings("h4")[0].innerText;
-        if(type === "Hotels") type = "Hotel";
         var option = $(this).siblings("select")[0].selectedOptions[0].outerText;
-        var hotels = $(".current")[0]//.childNodes[3]//.childNodes[3]//.childNodes[0];
-        var restaurants = $(".current")//[0].childNodes[3]//.childNodes[3]//.childNodes//[1];
-        var activities = $(".current")//[0].childNodes[3]//.childNodes[3]//.childNodes//[2];
-        console.dir("Hotels", hotels);
-        console.dir("Restaurants",restaurants);
-        console.dir("Activities",activities);
-        var hotelName = hotels.childNodes[1].innerText.slice(3);
-        var restaurantName = restaurants.childNodes[1].innerText.slice(3);
-        var activityName = activities.childNodes[1].innerText.slice(3);
+        var hotels = $(".current")[0].childNodes[3].childNodes[3].childNodes[0];
+        var restaurants = $(".current")[0].childNodes[3].childNodes[3].childNodes[1];
+        var activities = $(".current")[0].childNodes[3].childNodes[3].childNodes[2];
+        var hotelName = hotels.childNodes[0].innerText.slice(3);
+        var restaurantName = restaurants.childNodes[0].innerText.slice(3);
+        var activityName = activities.childNodes[0].innerText.slice(3);
         if(type === hotelName){
             var length = hotels.childNodes[1].childNodes.length;
             if(length < 1){
@@ -118,7 +114,6 @@
               console.dir($(hotels.childNodes[1]));
               $(hotels.childNodes[1]).append(html);
               days[(current-1).toString()]["hotels"]+= html;
-
             }
         }else if(type === restaurantName){
             var length = restaurants.childNodes[1].childNodes.length;
