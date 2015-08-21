@@ -37,62 +37,101 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQxgWt-LSZcEmTEN8581Uq9SzZHnpuys&sensor=true"></script>
     <script>
       function initialize_gmaps() {
-      // initialize new google maps LatLng object
-      var myLatlng = new google.maps.LatLng(40.705189,-74.009209);
-      // set the map options hash
-      var mapOptions = {
-        center: myLatlng,
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        styles: styleArr
-      };
-      // get the maps div's HTML obj
-      var map_canvas_obj = document.getElementById("map-canvas");
-      // initialize a new Google Map with the options
-      var map = new google.maps.Map(map_canvas_obj, mapOptions);
-      // Add the marker to the map
-      var marker = new google.maps.Marker({
-        position: myLatlng,
-        title:"Hello World!"
-      });
+        // initialize new google maps LatLng object
+        var myLatlng = new google.maps.LatLng(40.705189,-74.009209);
+        // set the map options hash
+        var mapOptions = {
+          center: myLatlng,
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          styles: styleArr
+        };
+        // get the maps div's HTML obj
+        var map_canvas_obj = document.getElementById("map-canvas");
+        // initialize a new Google Map with the options
+        var map = new google.maps.Map(map_canvas_obj, mapOptions);
+        // Add the marker to the map
+        var marker = new google.maps.Marker({
+          position: myLatlng,
+          title:"Hello World!"
+        });
+        return map;
+      }
 
-      // draw some locations on the map
-      // var hotelLocation = [40.705137, -74.007624];
-      // var restaurantLocations = [
-      //   [40.705137, -74.013940],
-      //   [40.708475, -74.010846]
-      // ];
-      // var activityLocations = [
-      //   [40.716291, -73.995315],
-      //   [40.707119, -74.003602]
-      // ];
-      // function drawLocation (location, opts) {
-      //   if (typeof opts !== 'object') {
-      //     opts = {}
-      //   }
-      //   opts.position = new google.maps.LatLng(location[0], location[1]);
-      //   opts.map = map;
-      //   var marker = new google.maps.Marker(opts);
-      // }
-      // drawLocation(hotelLocation, {
-      //   icon: '/images/lodging_0star.png'
-      // });
-      // restaurantLocations.forEach(function (loc) {
-      //   drawLocation(loc, {
-      //     icon: '/images/restaurant.png'
-      //   });
-      // });
-      // activityLocations.forEach(function (loc) {
-      //   drawLocation(loc, {
-      //     icon: '/images/star-3.png'
-      //   });
-      // });
-    }
     $(document).ready(function() {
-      initialize_gmaps();
+      var map = initialize_gmaps();
       var days = {};
       var current = 0;
       var numDays = 0;
+      var markers = [];
+      function drawMap(){
+        markers.forEach(function(marker){
+          marker.setMap(null);
+          console.log("individual markers: ", marker);
+        });
+        var hotelLocation = days[current-1].hotelLoc;
+        var restaurantLocations = days[current-1].restaurantLocs;
+        var activityLocations = days[current-1].activityLocs;
+        console.log(hotelLocation,restaurantLocations,activityLocations);
+        var currentMarkers = [];
+        function drawLocation (location, opts) {
+          if (typeof opts !== 'object') {
+            opts = {}
+          }
+          opts.position = new google.maps.LatLng(location[0], location[1]);
+          opts.map = map;
+          var marker = new google.maps.Marker(opts);
+          currentMarkers.push(marker);
+        }
+        if(hotelLocation.length>0){
+          drawLocation(hotelLocation, {
+            icon: '/images/lodging_0star.png'
+          });
+        }
+        restaurantLocations.forEach(function (loc) {
+          drawLocation(loc, {
+            icon: '/images/restaurant.png'
+          });
+        });
+        activityLocations.forEach(function (loc) {
+          drawLocation(loc, {
+            icon: '/images/star-3.png'
+          });
+        });
+        return currentMarkers;
+      }
+      function getLoc(type,name){
+        if(type==="Hotels"){
+          for (var i=0; all_hotels.length; i++){
+            if(all_hotels[i].name === name)
+              return all_hotels[i].place[0].location;
+          }
+        }
+        else if(type==="Activities"){
+          for (var i=0; all_activities.length; i++){
+            if(all_activities[i].name === name)
+              return all_activities[i].place[0].location;
+          }
+        }
+        else{
+          for (var i=0; all_restaurants.length; i++){
+            if(all_restaurants[i].name === name)
+              return all_restaurants[i].place[0].location;
+          }
+        }
+      }
+      function getIndex(location, arrayOfLoc){
+        var num1 = location[0]
+        var num2 = location[1]
+        for(var i = 0; i < arrayOfLoc.length; i++){
+          var currentLocation = arrayOfLoc[i];
+          var currentNum1 = currentLocation[0];
+          var currentNum2 = currentLocation[1];
+          if(currentNum1 === num1 && currentNum2 === num2){
+            return i;
+          }
+        }
+      }
       $(document).on("click",".add", function(){
         if(current === 0){
           console.log("Na");
@@ -110,36 +149,75 @@
             var length = hotels.childNodes[1].childNodes.length;
             if(length < 1){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              console.dir($(hotels.childNodes[1]));
               $(hotels.childNodes[1]).append(html);
               days[(current-1).toString()]["hotels"]+= html;
+              days[(current-1).toString()]["hotelLoc"] = getLoc(type,option);
             }
         }else if(type === restaurantName){
             var length = restaurants.childNodes[1].childNodes.length;
             if(length < 3){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              console.dir($(restaurants.childNodes[1]));
               $(restaurants.childNodes[1]).append(html);
-              days[(current-1).toString()]["restaurants"]+=html;
+              days[(current-1).toString()]["restaurants"]+= html;
+              days[(current-1).toString()]["restaurantLocs"].push(getLoc(type,option));
             }
         }else if(type === activityName){
             var length = activities.childNodes[1].childNodes.length;
             if(length < 2){
               var html = '<div class="itinerary-item"><span class="title">' + option +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
-              console.dir($(activities.childNodes[1]));
               $(activities.childNodes[1]).append(html);
-              days[(current-1).toString()]["activities"]+=html;
+              days[(current-1).toString()]["activities"]+= html;
+              days[(current-1).toString()]["activityLocs"].push(getLoc(type,option));
             }
         }
+        markers = drawMap();
       });
       $(document).on("click", ".remove", function(){
-        $(this).parent().remove()
+        var name = $(this).parent()[0].innerText
+        var type = $(this).parent().closest(".list-group").siblings("h4")[0].innerText;
+        name = name.substring(0,name.length-1);
+        if(type === "My Hotels"){
+          var hotels = days[(current-1).toString()]["hotels"];
+          var replace = '<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
+          var newHotels = hotels.replace('<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>',"");
+          days[(current-1).toString()]["hotels"] = newHotels;
+          markers[0].setMap(null);
+          markers = markers.slice(1);
+          days[(current-1).toString()]["hotelLoc"] = [];
+        }
+        else if(type === "My Restaurants"){
+          var restaurants = days[(current-1).toString()]["restaurants"]
+          var replace = '<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
+          var newRestaurants = restaurants.replace('<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>',"");
+          days[(current-1).toString()]["restaurants"] = newRestaurants;
+          var count = 0;
+          if(days[(current-1).toString()]["hotelLoc"].length === 2) count = 1;
+          var location = getLoc("Restaurants",name);
+          var index = getIndex(location,days[(current-1).toString()]["restaurantLocs"]);
+          markers[count+index].setMap(null);
+          markers.splice(count+index,1);
+          days[(current-1).toString()]["restaurantLocs"].splice(index,1);
+        }
+        else if(type === "My Activities"){
+          var activities = days[(current-1).toString()]["activities"]
+          var replace = '<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>'
+          var newActivities = activities.replace('<div class="itinerary-item"><span class="title">' + name +'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></div>',"");
+          days[(current-1).toString()]["activities"] = newActivities;
+          var count = 0;
+          if(days[(current-1).toString()]["hotelLoc"].length === 2) count = 1;
+          count = count + days[(current-1).toString()]["restaurantLocs"].length;
+          var location = getLoc("Activities",name);
+          var index = getIndex(location,days[(current-1).toString()]["activityLocs"]);
+          markers[count+index].setMap(null);
+          markers.splice(count+index,1);
+          days[(current-1).toString()]["activityLocs"].splice(index,1);
+        }
+        $(this).parent().remove();
       });
 
       $(document).on("click", ".removeDay", function(){
         var string = $(this).siblings("span")[0].innerText;
         var value = parseInt(string[string.length-1]);
-        console.log("The number just pressed", value);
         if(!isNaN(value)){
           if(value === 1){
             if(Object.keys(days).length === 1){
@@ -147,13 +225,11 @@
             }else{
               $(this).siblings("span").html("Pick a Day");
             }
-            console.log("ID # " + value);
             $("#"+value).remove();
             delete days[value-1];
             days = updateButtons();
             numDays--;
           }else{
-            console.log("ID # " + value);
             $(this).siblings("span").html("Pick a Day");
             $("#"+value).remove();
             delete days[value-1];
@@ -164,18 +240,12 @@
       });
 
       function updateButtons(){
-        console.log("Before");
-        console.dir(days);
         var newObj = {};
         var counter = 0;
         for(var key in days){
           if(key != counter){
             var oldId = parseInt(key) + 1;
             var newId = parseInt(counter+1);
-            console.log("Deleted Key",key);
-            console.log("New Counter",counter);
-            console
-            console.dir($("#"+oldId));
             $("#"+oldId).html(counter+1);
             $("#"+oldId).attr("id",newId.toString());
 
@@ -187,8 +257,6 @@
           }
           counter++;
         }
-        console.log("After");
-        console.dir(newObj);
         return newObj;
       }
 
@@ -201,19 +269,23 @@
         var parent = $(this).parent();
         $(this).remove();
         parent.append(last + " " + addDay);
-        days[numDays.toString()] = {"activities":'<div><h4>My Activities</h4><ul class="list-group">',"restaurants":'<div><h4>My Restaurants</h4><ul class="list-group">',"hotels":'<div><h4>My Hotels</h4><ul class="list-group">'};
-        console.log("Add");
-        console.dir(days);
+        days[numDays.toString()] = {"activities":'<div><h4>My Activities</h4><ul class="list-group">',"restaurants":'<div><h4>My Restaurants</h4><ul class="list-group">',"hotels":'<div><h4>My Hotels</h4><ul class="list-group">', "activityLocs":[],"hotelLoc":[],"restaurantLocs":[]};
         numDays++;
       });
 
       $(document).on("click", ".day-btn", function(){
+        for(var i = 0; i < markers.length; i ++){
+          markers.forEach(function(marker){
+            marker.setMap(null);
+          });
+        }
         var num = parseInt(this.innerText);
         current = num;
         var currentDay = days[(current - 1).toString()];
         var answer = currentDay["hotels"] + '</ul></div>' + currentDay["restaurants"] + '</ul></div>' + currentDay["activities"] + '</ul></div>'
         $(".day-info").html(answer);
         $("#day-title")[0].firstElementChild.innerText = "Day " + current.toString();
+        markers = drawMap();
       });
     });
 
