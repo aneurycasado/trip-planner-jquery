@@ -80,6 +80,7 @@
           }
           opts.position = new google.maps.LatLng(location[0], location[1]);
           opts.map = map;
+          opts.animation = google.maps.Animation.DROP;
           var marker = new google.maps.Marker(opts);
           currentMarkers.push(marker);
         }
