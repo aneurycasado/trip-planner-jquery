@@ -102,7 +102,7 @@
         currentMarkers.forEach(function(currentMarker){
           bounds.extend(currentMarker.position);
         })
-        map.fitBounds(bounds);
+        if(currentMarkers.length > 0) map.fitBounds(bounds);
         return currentMarkers;
       }
       function getLoc(type,name){
