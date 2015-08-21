@@ -88,7 +88,6 @@
       //   });
       // });
     }
-
     $(document).ready(function() {
       initialize_gmaps();
       var days = {};
@@ -137,10 +136,61 @@
         $(this).parent().remove()
       });
 
+      $(document).on("click", ".removeDay", function(){
+        var string = $(this).siblings("span")[0].innerText;
+        var value = parseInt(string[string.length-1]);
+        if(!isNaN(value)){
+          if(value === 1){
+            if(Object.keys(days).length === 1){
+              $(this).siblings("span").html("Plan Your Trip");
+            }else{
+              $(this).siblings("span").html("Plan Your Trip");
+            }
+            $("#"+value).remove();
+            delete days[value-1];
+            days = updateButtons();
+            numDays--;
+          }else{
+            $(this).siblings("span").html("Pick a Day");
+            $("#"+value).remove();
+            delete days[value-1];
+            days = updateButtons();
+            numDays--;
+          }
+        }
+      });
+
+      function updateButtons(){
+        console.log("Before");
+        console.dir(days);
+        var newObj = {};
+        var counter = 0;
+        for(var key in days){
+          if(key != counter){
+            var oldId = parseInt(key) + 1;
+            var newId = parseInt(counter);
+            console.log("Deleted Key",key);
+            console.log("New Counter",counter);
+            console.dir($("#"+oldId));
+            $("#"+oldId).html(counter+1);
+            $("#"+oldId).attr("id",newId.toString());
+            var value = days[key];
+            newObj[counter] = value;
+          }else{
+            var value = days[key];
+            newObj[key] = value;
+          }
+          counter++;
+        }
+        console.log("After");
+        console.dir(newObj);
+        return newObj;
+      }
+
       $(document).on("click", ".add-day", function(){
         if($(this).prev()[0] == undefined) var dayNum = 1;
         else var dayNum = parseInt($(this).prev()[0].innerText)+1;
-        var last = '<button class="btn btn-circle day-btn">'+dayNum+'</button>';
+        var last = '<button class="btn btn-circle day-btn" id = ' + dayNum +'>'+dayNum+'</button>';
         var addDay = '<button class="btn btn-circle add-day">+</button>'
         var dayInfo = '<div class="panel-body day-info"><div><h4>My Hotel</h4><ul class="list-group"></ul></div><div><h4>My Restaurants</h4><ul class="list-group"></ul></div><div><h4>My Activities</h4><ul class="list-group"></ul></div></div>'
         var parent = $(this).parent();
@@ -151,15 +201,10 @@
       });
 
       $(document).on("click", ".day-btn", function(){
-        console.dir(this);
-        console.log("Inner",this.innerText)
         var num = parseInt(this.innerText);
         current = num;
-        console.log("Current", current);
         var currentDay = days[(current - 1).toString()];
-        console.log(current);
         var answer = currentDay["hotels"] + '</ul></div>' + currentDay["restaurants"] + '</ul></div>' + currentDay["activities"] + '</ul></div>'
-        console.log("Answer", answer);
         $(".day-info").html(answer);
         $("#day-title")[0].firstElementChild.innerText = "Day " + current.toString();
       });

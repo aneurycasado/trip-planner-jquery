@@ -104,6 +104,23 @@ h3 {
     .day-btn.current-day:hover {
       background: #fff; }
 
+.add-day {
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+  padding: 5px 5px;
+  background: transparent;
+  border-color: #a8c9dd;
+  color: #a8c9dd; }
+  .add-day:hover {
+    border-color: #fff;
+    color: #fff; }
+  .add-day.current-day {
+    background: #a8c9dd;
+    color: #736357; }
+    .add-day.current-day:hover {
+      background: #fff; }
+
 .panel-default {
   background: #efecea;
   border-radius: 8px;

@@ -136,6 +136,27 @@ h3 {
   }
 }
 
+.add-day {
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+  padding: 5px 5px;
+  background: $transparent;
+  border-color: $light-blue;
+  color: $light-blue;
+  &:hover {
+    border-color: #fff;
+    color: #fff;
+  }
+  &.current-day {
+    background: $light-blue;
+    color: $medium-brown;
+    &:hover {
+      background: #fff;
+    }
+  }
+}
+
 .panel-default {
   background: lighten($medium-brown, 53%);
   border-radius: 8px;
